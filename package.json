@@ -1,0 +1,13 @@
+{
+  "name": "pearlsim",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node serve.mjs",
+    "test": "node test/engine.test.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^22.0.0"
+  }
+}

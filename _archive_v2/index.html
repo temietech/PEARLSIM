@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>P.E.A.R.L. • Simulation Modality (Meta Quest 3 WebXR)</title>
+  <link rel="stylesheet" href="./src/style.css?v=ue_prototype2">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       Screen 1: Landing Hub (Matching Unreal Engine Prototype t_08s.jpg)
+       ========================================================================== -->
+  <section class="app-screen active" id="screen-landing">
+    <div class="landing-container">
+      
+      <!-- Central P.E.A.R.L. Tooth + Orbital Pearl Logo -->
+      <header class="landing-header">
+        <div class="pearl-logo-emblem">
+          <svg class="pearl-svg-icon" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="toothGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0284c7" />
+                <stop offset="100%" stop-color="#0ea5e9" />
+              </linearGradient>
+              <radialGradient id="pearlSphereGrad" cx="35%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#ffffff" />
+                <stop offset="45%" stop-color="#e0f2fe" />
+                <stop offset="75%" stop-color="#7dd3fc" />
+                <stop offset="100%" stop-color="#0284c7" />
+              </radialGradient>
+              <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+            </defs>
+
+            <!-- Orbital Ring behind -->
+            <path d="M 20 86 C 16 70, 72 48, 134 58 C 150 61, 154 70, 142 78 C 120 92, 48 106, 20 86 Z" 
+                  stroke="#38bdf8" stroke-width="4.5" fill="none" opacity="0.85" />
+
+            <!-- Stylized Tooth Outline -->
+            <path d="M 44 48 
+                     C 44 32, 60 22, 80 22 
+                     C 100 22, 116 32, 116 48 
+                     C 116 64, 112 82, 110 114 
+                     C 109 126, 95 138, 88 120 
+                     C 84 110, 80 100, 80 100 
+                     C 80 100, 76 110, 72 120 
+                     C 65 138, 51 126, 50 114 
+                     C 48 82, 44 64, 44 48 Z" 
+                  stroke="url(#toothGrad)" stroke-width="5" fill="#ffffff" fill-opacity="0.9" />
+
+            <!-- Iridescent Pearl Sphere in Center -->
+            <circle cx="80" cy="56" r="22" fill="url(#pearlSphereGrad)" filter="url(#softGlow)" />
+            <circle cx="73" cy="49" r="6" fill="#ffffff" opacity="0.8" />
+
+            <!-- Orbital Ring foreground slice crossing in front of tooth -->
+            <path d="M 28 88 C 42 100, 110 98, 140 76" 
+                  stroke="#0284c7" stroke-width="4.5" stroke-linecap="round" fill="none" />
+          </svg>
+        </div>
+
+        <h1 class="landing-logo">P.E.A.R.L.</h1>
+        <p class="landing-sub">SIMULATION MODALITY</p>
+      </header>
+
+      <!-- 5 P.E.A.R.L. Glossy Cyan Beveled Buttons (Exact match to t_08s.jpg) -->
+      <div class="pearl-pillars-row">
+        <!-- P - Personalisation -->
+        <button class="pearl-pillar-btn disabled" title="Personalisation Module">
+          <div class="pillar-icon-box">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="pillar-svg">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </div>
+          <span class="pillar-text">P - Personalisation</span>
+        </button>
+
+        <!-- E - Emergency (Active Clinical Module) -->
+        <button class="pearl-pillar-btn active" id="btn-pillar-emergency" title="Emergency Resuscitation Module">
+          <div class="pillar-icon-box emergency-box">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="pillar-svg emergency-cross">
+              <path d="M19 10.5h-5.5V5h-3v5.5H5v3h5.5V19h3v-5.5H19v-3z"/>
+            </svg>
+          </div>
+          <span class="pillar-text">E - Emergency</span>
+        </button>
+
+        <!-- A - Assessment -->
+        <button class="pearl-pillar-btn disabled" title="Assessment & Competency Module">
+          <div class="pillar-icon-box">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="pillar-svg">
+              <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+            </svg>
+          </div>
+          <span class="pillar-text">A - Assessment</span>
+        </button>
+
+        <!-- R - Reality -->
+        <button class="pearl-pillar-btn disabled" title="Reality & Spatial Operatory Module">
+          <div class="pillar-icon-box">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="pillar-svg">
+              <path d="M12 2C8 2 6 5 6 9c0 4.5 2 9 3 13 1 1 2 1 3-2 1-3 1-3 2 0 1 3 2 3 3 2 1-4 3-8.5 3-13 0-4-2-7-6-7z"/>
+            </svg>
+          </div>
+          <span class="pillar-text">R - Reality</span>
+        </button>
+
+        <!-- L - Language -->
+        <button class="pearl-pillar-btn disabled" title="Language & Dialogue Module">
+          <div class="pillar-icon-box">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="pillar-svg">
+              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-6 9H6v-2h8v2zm4-4H6V5h12v2z"/>
+            </svg>
+          </div>
+          <span class="pillar-text">L - Language</span>
+        </button>
+      </div>
+
+      <!-- Patient History & Encounter Briefing Dossier -->
+      <div class="briefing-card" id="landing-history-card">
+        <div class="briefing-title">PATIENT HISTORY &amp; ENCOUNTER BRIEFING</div>
+        
+        <div class="dossier-grid">
+          <div class="dossier-item">
+            <span class="dossier-label">Patient Name &amp; Identity</span>
+            <span class="dossier-val" id="dossier-name">Mrs. Evelyn Adebayo (76 y/o, Female)</span>
+          </div>
+
+          <div class="dossier-item">
+            <span class="dossier-label">Dermatology / Ethnicity</span>
+            <span class="dossier-val">African (Fitzpatrick Phototype VI • Oral Mucosa Standard)</span>
+          </div>
+
+          <div class="dossier-item">
+            <span class="dossier-label">Chief Complaint</span>
+            <span class="dossier-val">Sharp pain posterior region. Skipped breakfast to arrive on time.</span>
+          </div>
+
+          <div class="dossier-item">
+            <span class="dossier-label">Medical Condition</span>
+            <span class="dossier-val">Type 2 Diabetes Mellitus, Mild Hypertension</span>
+          </div>
+
+          <div class="dossier-item">
+            <span class="dossier-label">Current Medications</span>
+            <span class="dossier-val">Metformin 500mg BD, Amlodipine 5mg OD</span>
+          </div>
+
+          <div class="dossier-item">
+            <span class="dossier-label">Allergies &amp; Alerts</span>
+            <span class="dossier-val" style="color:#b45309; font-weight:700;">Suspected cutaneous latex reaction (2018)</span>
+          </div>
+        </div>
+
+        <!-- Scenario Mode Selection Dropdown -->
+        <div class="scenario-mode-selector">
+          <div>
+            <div class="dossier-label">Clinical Scenario Mode</div>
+            <div class="dossier-val" id="mode-summary-text">Blind Triage Assessment (Standard Clinical Exam)</div>
+          </div>
+          <div>
+            <select class="mode-select" id="select-scenario" title="Select Simulation Mode">
+              <option value="BLIND">Blind Triage (Unannounced Emergency)</option>
+              <option value="ANAPHYLAXIS">Configured: Acute Anaphylactic Shock</option>
+              <option value="HYPOGLYCEMIA">Configured: Severe Hypoglycemic Crisis</option>
+              <option value="MYOCARDIAL_INFARCTION">Configured: Acute Coronary Syndrome (STEMI)</option>
+              <option value="VASOVAGAL_SYNCOPE">Configured: Vasovagal Syncope</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Launch Button -->
+        <button class="btn-launch" id="btn-start-encounter">ENTER OPERATORY CLINIC</button>
+      </div>
+
+      <footer class="landing-footer-note">
+        P.E.A.R.L. SIMULATION FRAMEWORK • PEARLY WHITES GLOBAL • VERSION 1.0.0
+      </footer>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Screen 2: Unobstructed 3D Dental Operatory Simulation
+       Matching Unreal Engine Prototype t_20s.jpg & t_35s.jpg
+       ========================================================================== -->
+  <section class="app-screen" id="screen-sim">
+    <!-- 3D Three.js WebGL Canvas Layer (Full Viewport) -->
+    <div id="canvas-container"></div>
+
+    <!-- Minimal Top-Left Brand Status Badge (Zero top-bar occlusion) -->
+    <div class="minimal-brand-badge">
+      <span class="badge-title">P.E.A.R.L.</span>
+      <span class="badge-sep">•</span>
+      <span class="badge-module">DENTAL OPERATORY</span>
+      <span class="badge-status-dot" id="sim-status-dot"></span>
+      <span class="badge-status-text" id="sim-status-text">ROUTINE CHECKUP</span>
+    </div>
+
+    <!-- Minimal Top-Right Spatial Utility Pills -->
+    <div class="minimal-top-actions">
+      <button class="subtle-pill-btn" id="btn-quick-pulse" title="Palpate Radial Pulse">Radial Pulse</button>
+      <button class="subtle-pill-btn" id="btn-toggle-dossier" title="View Patient Medical History">Dossier</button>
+      <button class="subtle-pill-btn" id="btn-enter-xr" style="display:none;" title="Enter Meta Quest 3 WebXR">Quest 3 WebXR</button>
+      <button class="subtle-pill-btn danger" id="btn-conclude-encounter" title="Conclude Encounter">Conclude</button>
+    </div>
+
+    <!-- Observation Phase: [ STOP PROCEDURE ] Button (Top-Right, matching t_35s.jpg) -->
+    <button class="btn-stop-procedure" id="btn-stop-procedure" style="display:none;">
+      <span>STOP PROCEDURE</span>
+      <span class="stop-timer-badge" id="stop-timer-display">00:00</span>
+    </button>
+
+    <!-- Start Dialogue Bar (Bottom Center, matching t_20s.jpg) -->
+    <div class="start-dialogue-bar" id="start-dialogue-bar">
+      <div class="dialogue-content">
+        <div class="dialogue-speaker-name" id="start-dialogue-speaker">Patient (Mrs. Adebayo)</div>
+        <div class="dialogue-quote" id="start-dialogue-text">"I have a sharp pain somewhere at the back. Let's just get this over with, I skipped breakfast to be here on time and I want to eat..."</div>
+      </div>
+      <button class="btn-start-procedure" id="btn-begin-procedure">START</button>
+    </div>
+
+    <!-- Active Medication Delivery Notice Banner -->
+    <div class="delivery-notice-banner" id="drug-delivery-banner">
+      <div class="delivery-drug-title" id="delivery-banner-drug">Adrenaline (EpiPen) 1:1000 Selected</div>
+      <div class="delivery-drug-sub" id="delivery-banner-instruction">Click the approved Vastus Lateralis outer thigh target on the patient for intramuscular injection.</div>
+    </div>
+
+    <!-- 10-Second Depot Hold Countdown Overlay -->
+    <div id="injection-hold-overlay" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(15,23,42,0.95); border:2px solid #10b981; border-radius:18px; padding:28px 36px; z-index:55; text-align:center; box-shadow:0 16px 50px rgba(0,0,0,0.7);">
+      <div style="font-size:11px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:#10b981;">Intramuscular Auto-Injector Depot Hold</div>
+      <div style="font-size:52px; font-weight:900; font-family:var(--font-mono); color:#ffffff; margin:10px 0;" id="hold-countdown-num">10s</div>
+      <div style="font-size:12px; color:#cbd5e1; max-width:290px; line-height:1.4;">Holding needle firmly in vastus lateralis muscle to ensure complete intramuscular absorption...</div>
+    </div>
+
+    <!-- Floating Emergency Module Quiz Modal (Matching Unreal Prototype t_65s.jpg) -->
+    <!-- Floats in center, does NOT fill whole page: 3D scene remains visible in background -->
+    <div class="quiz-floating-modal" id="quiz-modal">
+      <div class="quiz-header">
+        <h1 class="quiz-main-headline">EMERGENCY MODULE QUIZ</h1>
+        <h2 class="quiz-question-sub" id="quiz-question-title">WHICH SYMPTOMS DID THE PATIENT HAVE?</h2>
+      </div>
+
+      <!-- Quiz Options Container (White rounded pills matching t_65s.jpg) -->
+      <div class="quiz-options-list" id="quiz-options-container">
+        <!-- Dynamically rendered pills -->
+      </div>
+
+      <!-- Instant Feedback Status Line -->
+      <div id="quiz-feedback-line" style="display:none; font-size:13px; font-weight:700; margin-bottom:14px; text-align:center;"></div>
+
+      <!-- Next Action Button (Bottom Right) -->
+      <div class="quiz-footer-actions">
+        <button class="btn-quiz-next" id="btn-quiz-action">Next</button>
+      </div>
+    </div>
+
+    <!-- Post-Resuscitation Completion Banner -->
+    <div id="resuscitation-done-banner" style="display:none; position:absolute; bottom:36px; left:50%; transform:translateX(-50%); background:rgba(15,23,42,0.95); border:1px solid #10b981; border-radius:14px; padding:18px 28px; z-index:35; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,0.6);">
+      <div style="font-size:12px; font-weight:800; color:#10b981; text-transform:uppercase; letter-spacing:0.8px;">Patient Resuscitated &amp; Airway Stabilized</div>
+      <div style="font-size:13px; color:#f8fafc; margin:4px 0 12px 0;">All acute symptoms successfully managed. Perfusion restored.</div>
+      <button class="btn-quiz-next" id="btn-view-session-report" style="padding:10px 24px; font-size:13px;">VIEW SESSION REPORT &amp; AUDIT</button>
+    </div>
+
+    <!-- Bottom Radial Pulse Toast -->
+    <div class="radial-toast" id="pulse-toast" style="display:none;">
+      <div class="toast-metric" id="pulse-rate">74 BPM</div>
+      <div class="toast-meta">
+        <div class="toast-label">Radial Pulse Palpation (Left Wrist)</div>
+        <div class="toast-desc" id="pulse-desc">Regular rhythm, strong volume. Warm peripheries. Capillary refill &lt; 2s.</div>
+      </div>
+    </div>
+
+    <!-- Patient Medical History Drawer -->
+    <div id="dossier-drawer" style="display:none; position:absolute; top:70px; right:24px; width:340px; background:rgba(15,23,42,0.96); backdrop-filter:blur(24px); border:1px solid var(--border-cyan); border-radius:14px; padding:20px; z-index:40; box-shadow:0 12px 36px rgba(0,0,0,0.6);">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-light); padding-bottom:8px; margin-bottom:12px;">
+        <span style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:var(--accent-cyan);">Patient Clinical Record</span>
+        <button id="btn-close-dossier" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; font-weight:bold;">X</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
+        <div><strong style="color:var(--text-dim); text-transform:uppercase; font-size:10px;">Name:</strong> Mrs. Evelyn Adebayo (76 y/o)</div>
+        <div><strong style="color:var(--text-dim); text-transform:uppercase; font-size:10px;">Condition:</strong> Type 2 Diabetes Mellitus, Mild HTN</div>
+        <div><strong style="color:var(--text-dim); text-transform:uppercase; font-size:10px;">Medications:</strong> Metformin 500mg BD, Amlodipine 5mg OD</div>
+        <div><strong style="color:#ef4444; text-transform:uppercase; font-size:10px;">Allergies:</strong> Suspected cutaneous latex reaction (2018)</div>
+        <div><strong style="color:var(--text-dim); text-transform:uppercase; font-size:10px;">Baseline:</strong> BP 128/82, HR 74 BPM, Glucose 6.2, SpO2 98%</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Screen 3: Session Report (Matching Unreal Prototype + CPD PDF)
+       ========================================================================== -->
+  <section class="app-screen" id="screen-debrief">
+    <div class="audit-container">
+      <header class="audit-header">
+        <div>
+          <h1 class="audit-title">P.E.A.R.L. • Session Report</h1>
+          <p class="audit-sub">Emergency Module Resuscitation Audit • Pearly Whites Global</p>
+        </div>
+
+        <div class="audit-score-badge">
+          <div class="score-num" id="debrief-score">A - 96%</div>
+          <div class="score-label" id="debrief-grade">DISTINCTION</div>
+        </div>
+      </header>
+
+      <!-- Exact Session Report Breakdown from Unreal Prototype -->
+      <div class="report-grid">
+        <div class="report-col">
+          <div class="report-row">
+            <span class="label">Time to Recognition:</span>
+            <span class="val" id="report-recog-time">00:14</span>
+          </div>
+          <div class="report-row">
+            <span class="label">Time to Intervention:</span>
+            <span class="val" id="report-interv-time">00:32</span>
+          </div>
+          <div class="report-row">
+            <span class="label">Patient Outcome:</span>
+            <span class="val badge-pass" id="report-outcome">STABILIZED</span>
+          </div>
+        </div>
+
+        <div class="report-col">
+          <div class="report-row">
+            <span class="label">Symptom Check:</span>
+            <span class="val badge-pass" id="report-symptom-check">[PASS] Identified 3 of 3 Symptoms</span>
+          </div>
+          <div class="report-row">
+            <span class="label">Differential Diagnosis:</span>
+            <span class="val badge-pass" id="report-diag-check">[PASS] Identified Anaphylaxis</span>
+          </div>
+          <div class="report-row">
+            <span class="label">Treatment Protocol:</span>
+            <span class="val badge-pass" id="report-treat-check">[PASS] Adrenaline 1:1000 IM (Vastus Lateralis)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chronological Clinical Action Log Table -->
+      <div class="log-section">
+        <div class="log-title">Chronological Clinical Action Log</div>
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th style="width: 80px;">Time</th>
+              <th>Clinical Event / Intervention</th>
+            </tr>
+          </thead>
+          <tbody id="debrief-log-rows">
+            <!-- Dynamically populated from ClinicalEngine audit log -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Action Buttons -->
+      <footer class="audit-actions">
+        <button class="btn-print" id="btn-print-audit">Print / Save CPD Audit Report (PDF)</button>
+        <button class="btn-restart" id="btn-retry-encounter">RETRY ENCOUNTER</button>
+        <button class="btn-restart" id="btn-exit-menu" style="background:var(--bg-surface); border-color:var(--border-light);">EXIT TO MENU</button>
+      </footer>
+    </div>
+  </section>
+
+  <!-- Three.js Import Map -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <!-- Ground-Up Application Core -->
+  <script type="module" src="./src/main.js?v=ue_prototype2"></script>
+</body>
+</html>

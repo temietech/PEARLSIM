@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P.E.A.R.L. - Universal Acute Healthcare Simulation</title>
+<link rel="icon" type="image/svg+xml" href="./public/favicon.svg">
+<style>
+  :root {
+    --navy:#0d1b2a; --navy2:#14263a; --cyan:#22d3ee; --cyan-soft:#a5f3fc; --ink:#101b2b; --mute:#64748b;
+    --ok:#34d399; --bad:#f43f5e; --warn:#fbbf24;
+    --a-bg:#081822; --a-card:rgba(24,52,66,.62); --a-line:rgba(140,190,205,.28); --a-ink:#e8f6fb; --a-mute:#8fb3c2;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; background:#0b1220; font:16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); }
+  canvas#view { position:fixed; inset:0; width:100%; height:100%; display:block; touch-action:none; }
+  [hidden] { display:none !important; }
+  button { font:inherit; cursor:pointer; }
+
+  /* ---------- landing ---------- */
+  #start { position:fixed; inset:0; overflow:auto; display:flex; flex-direction:column;
+    background:radial-gradient(circle at 50% 18%, #ffffff 0%, #eef3f8 58%, #dce4ee 100%); }
+  .land { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:clamp(16px,3vh,34px) 0 0; gap:clamp(12px,2vh,22px); }
+  .brand { display:flex; align-items:center; gap:18px; margin:0 16px; }
+  .brand img.brand-logo { height:152px; width:auto; margin:-14px 0 -10px; object-fit:contain; mix-blend-mode:multiply; filter:drop-shadow(0 6px 14px rgba(15,23,42,.12)); }
+  .p-tile-img { width:100%; max-width:132px; height:auto; border-radius:12px; object-fit:contain; box-shadow:0 6px 16px rgba(15,23,42,.18); }
+  #splashOverlay { position:fixed; inset:0; z-index:40; background:#7cb6df url('./public/assets/splash-bg.jpg') center/cover no-repeat; cursor:pointer; transition:opacity .35s ease; }
+  #splashOverlay.hide { opacity:0; pointer-events:none; }
+  .brand h1 { margin:0; font-size:clamp(34px,5.4vw,54px); letter-spacing:.07em; font-weight:900; color:#152336; line-height:1; }
+  .brand h1 i { color:var(--cyan); font-style:normal; }
+  .brand p { margin:6px 0 0; font-size:12px; letter-spacing:.24em; color:#475569; font-weight:700; }
+
+  /* ---------- STAGE 1: P.E.A.R.L. PILLARS SCREEN ---------- */
+  #stagePearl { flex:1; width:100%; max-width:1160px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:6px 22px 24px; gap:20px; }
+  .stage-sub { margin:0; font-size:11.5px; font-weight:800; letter-spacing:.2em; color:#0369a1; background:rgba(34,211,238,.12); border:1px solid rgba(34,211,238,.38); padding:7px 20px; border-radius:99px; text-transform:uppercase; box-shadow:0 4px 14px rgba(34,211,238,.12); }
+  .pearl-cards { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:14px; width:100%; max-width:1080px; }
+  .p-card { position:relative; aspect-ratio:1 / 1; border-radius:20px; border:1px solid #cbd5e1; background:linear-gradient(165deg,#ffffff 0%,#f1f5f9 65%,#e4ebf3 100%);
+    box-shadow:0 12px 28px rgba(15,23,42,.10), inset 0 1px 0 #fff; padding:14px 12px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:6px;
+    transition:transform .18s, box-shadow .18s, border-color .18s; color:#0f172a; }
+  .p-card:not(:disabled):hover { transform:translateY(-5px); border-color:var(--cyan); box-shadow:0 20px 38px rgba(15,23,42,.16), 0 0 0 3px rgba(34,211,238,.24); }
+  .p-card:disabled { opacity:.68; cursor:not-allowed; pointer-events:none; touch-action:none; user-select:none; background:linear-gradient(165deg,#f8fafc 0%,#edf2f7 100%); box-shadow:0 6px 16px rgba(15,23,42,.05), inset 0 1px 0 #fff; }
+  .p-card.featured { background:linear-gradient(165deg,#162b42 0%,#0b1726 100%); border:2px solid var(--cyan); color:#f8fafc;
+    box-shadow:0 0 0 4px rgba(34,211,238,.22), 0 0 32px rgba(34,211,238,.35), 0 18px 38px rgba(8,20,32,.48); }
+  .p-badge { width:48px; height:48px; border-radius:14px; display:grid; place-items:center; font-size:24px; font-weight:900; background:linear-gradient(180deg,#f8fafc,#dbe4ee); color:#0f172a; border:1px solid #cbd5e1; box-shadow:0 6px 14px rgba(15,23,42,.08), inset 0 1px 0 #fff; flex:none; }
+  .p-card.featured .p-badge { background:linear-gradient(180deg,#67e8f9,#06b6d4); color:#04202b; border-color:#a5f3fc; box-shadow:0 0 24px rgba(34,211,238,.65); }
+  .p-card h3 { margin:2px 0 0; font-size:clamp(11.5px, 1.25vw, 14px); font-weight:800; letter-spacing:.06em; }
+  .p-card .p-sub { font-size:10px; font-weight:700; color:#0284c7; letter-spacing:.02em; line-height:1.25; }
+  .p-card.featured .p-sub { color:var(--cyan-soft); }
+  .p-card p { margin:0; font-size:10.5px; color:#475569; line-height:1.3; }
+  .p-card.featured p { color:#cbd5e1; }
+  .p-card .p-go { margin-top:4px; font-size:9.5px; font-weight:800; letter-spacing:.10em; padding:5px 12px; border-radius:99px; background:#e2e8f0; color:#64748b; text-transform:uppercase; transition:background .15s; white-space:nowrap; }
+  .p-card.featured .p-go { background:rgba(34,211,238,.22); border:1px solid var(--cyan); color:#e6fbff; box-shadow:0 0 14px rgba(34,211,238,.3); }
+
+  .pearl-footer { width:100%; align-self:stretch; padding:18px 24px; background:linear-gradient(180deg,var(--navy2),var(--navy)); color:#94a3b8; display:flex; align-items:center; justify-content:center; gap:28px; flex-wrap:wrap; font-size:12px; letter-spacing:.1em; font-weight:600; border-top:1px solid rgba(34,211,238,.25); }
+  .pearl-footer span b { color:var(--cyan); }
+
+  /* ---------- STAGE 2: DISCIPLINE & CLINICAL BRIEFING SCREEN ---------- */
+  #stageDiscipline { flex:1; width:100%; display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:10px; }
+  .top-bar { display:flex; align-items:center; justify-content:space-between; gap:16px; width:min(820px, calc(100% - 32px)); }
+  .back-btn { padding:6px 15px; border-radius:99px; border:1px solid #cbd5e1; background:#ffffff; color:#1e293b; font-size:12px; font-weight:700; letter-spacing:.04em; box-shadow:0 2px 6px rgba(15,23,42,.06); }
+  .back-btn:hover { border-color:var(--cyan); background:#f8fafc; }
+  .pillar-crumb { font-size:11px; font-weight:800; letter-spacing:.14em; color:#0369a1; background:rgba(34,211,238,.12); border:1px solid rgba(34,211,238,.32); padding:5px 14px; border-radius:99px; }
+
+  .tiles { display:grid; grid-template-columns:repeat(4,minmax(0,154px)); gap:14px; margin:0 16px; }
+  .tile { position:relative; aspect-ratio:1.12; border-radius:18px; border:1px solid #d5dbe1; background:linear-gradient(180deg,#fdfdfe,#e9edf0);
+    box-shadow:0 10px 24px rgba(15,23,42,.11), inset 0 1px 0 #fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; color:#1b2a3d; padding:10px; }
+  .tile svg { width:40%; height:40%; }
+  .tile b { font-size:clamp(14px,1.7vw,18px); letter-spacing:.06em; }
+  .tile span { font-size:11px; color:var(--mute); }
+  .tile.on { background:linear-gradient(180deg,#132438,#0b1826); border:2px solid var(--cyan); color:var(--cyan);
+    box-shadow:0 0 0 4px rgba(34,211,238,.18), 0 0 32px rgba(34,211,238,.5), 0 14px 28px rgba(8,20,32,.48); }
+  .tile.on span { color:var(--cyan-soft); }
+  .tile:disabled { cursor:not-allowed; opacity:.74; pointer-events:none; touch-action:none; user-select:none; }
+  .tile em { position:absolute; top:7px; right:7px; font:700 8.5px/1 system-ui; letter-spacing:.08em; color:#64748b; background:#e2e8f0; border-radius:99px; padding:3px 6px; font-style:normal; }
+
+  /* Sleek Clinical Briefing Dossier */
+  .dossier { position:relative; z-index:1; width:min(820px,calc(100% - 32px)); border-radius:18px; background:rgba(255,255,255,.92); border:1px solid #ffffff;
+    box-shadow:0 16px 38px rgba(15,23,42,.16); backdrop-filter:blur(14px); padding:15px 22px 14px; text-align:left; }
+
+  .char-banner { display:flex; align-items:center; justify-content:space-between; gap:14px; background:linear-gradient(90deg,#f8fafc,#f1f5f9); border:1px solid #cbd5e1; border-radius:12px; padding:11px 16px; margin-bottom:12px; }
+  .char-info h3 { margin:0; font-size:16.5px; color:#0f172a; font-weight:800; letter-spacing:.01em; }
+  .char-info p { margin:3px 0 0; font-size:12.5px; color:#475569; }
+  .active-tag { padding:5px 12px; border-radius:99px; background:#d1fae5; border:1px solid #6ee7b7; color:#065f46; font-size:10.5px; font-weight:800; letter-spacing:.08em; white-space:nowrap; text-transform:uppercase; }
+
+  .setup { display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px; text-align:left; margin-top:10px; }
+  .setup[hidden] { display:none; }
+  .cfg-btn { padding:6px 13px; border-radius:99px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:11px; font-weight:800; letter-spacing:.05em; cursor:pointer; white-space:nowrap; }
+  .cfg-btn:hover { border-color:var(--cyan); background:#f0f9ff; }
+  .diff-bar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; padding:8px 12px; border-radius:10px; background:#f8fafc; border:1px solid #e2e8f0; }
+  .diff-bar > span { font-size:11px; font-weight:800; letter-spacing:.08em; color:#334155; text-transform:uppercase; white-space:nowrap; }
+  .diff-pills { display:flex; gap:6px; flex-wrap:wrap; }
+  .diff-pill { padding:6px 12px; border-radius:99px; border:1px solid #cbd5e1; background:#ffffff; color:#334155; font-size:11.5px; font-weight:700; cursor:pointer; transition:all .15s; }
+  .diff-pill:hover { border-color:var(--cyan); color:#0f172a; }
+  .diff-pill.on { background:#0e7490; border-color:#0e7490; color:#ffffff; box-shadow:0 2px 8px rgba(14,116,144,.25); }
+  .setup label { display:block; font-size:10.5px; font-weight:800; letter-spacing:.08em; color:#334155; text-transform:uppercase; }
+  .setup input, .setup select { width:100%; margin-top:4px; padding:7px 10px; border:1px solid #cbd5e1; border-radius:9px; font:inherit; font-size:13px; font-weight:600; background:#fff; color:var(--ink); }
+
+  .session-details { margin-top:10px; padding-top:8px; border-top:1px solid #e2e8f0; font-size:12px; color:#475569; }
+  .session-details summary { cursor:pointer; font-weight:700; font-size:11px; letter-spacing:.06em; color:#64748b; text-transform:uppercase; user-select:none; }
+  .session-details summary:hover { color:#0f172a; }
+  .session-row { display:grid; grid-template-columns:1.4fr 1fr; gap:12px; margin-top:8px; }
+  .session-row label { display:block; font-size:10px; font-weight:700; letter-spacing:.08em; color:var(--mute); text-transform:uppercase; }
+  .session-row input, .session-row select { width:100%; margin-top:3px; padding:6px 9px; border:1px solid #cbd5e1; border-radius:8px; font:inherit; font-size:12.5px; background:#fff; color:var(--ink); }
+
+  .enter { align-self:stretch; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; margin-top:18px; padding:22px 16px 18px; background:linear-gradient(180deg,var(--navy2),var(--navy)); }
+  .cta { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; }
+  .pill { padding:12px 32px; border-radius:99px; border:2px solid var(--cyan); background:rgba(34,211,238,.14); color:#e6fbff; font-weight:800; letter-spacing:.14em; font-size:14px;
+    box-shadow:0 0 24px rgba(34,211,238,.38), inset 0 0 14px rgba(34,211,238,.18); transition:background .15s, box-shadow .15s; }
+  .pill:hover:not(:disabled) { background:rgba(34,211,238,.25); box-shadow:0 0 32px rgba(34,211,238,.65), inset 0 0 14px rgba(34,211,238,.28); }
+  .pill.alt { border-color:rgba(165,243,252,.55); box-shadow:none; font-size:13px; padding:11px 24px; }
+  .pill:disabled { opacity:.38; cursor:not-allowed; }
+  #xrNote { margin:0; font-size:12px; color:#93a9bb; text-align:center; }
+
+  /* ---------- IN-SESSION PATIENT VITALS & RCUK PROTOCOL HUD ---------- */
+  #pill { position:fixed; left:50%; top:12px; transform:translateX(-50%); padding:7px 20px; border-radius:99px; background:rgba(8,22,32,.78); border:1px solid rgba(34,211,238,.45);
+    box-shadow:0 0 18px rgba(34,211,238,.2); color:#e8f6fb; font-size:12.5px; letter-spacing:.16em; font-weight:700; backdrop-filter:blur(10px); pointer-events:none; white-space:nowrap; z-index:10; }
+  #pill b { color:var(--cyan); font-weight:800; }
+  #pill.crisis { border-color:var(--bad); box-shadow:0 0 22px rgba(244,63,94,.45); }
+  #pill.crisis b { color:#fda4af; }
+
+  #hint { position:fixed; left:50%; bottom:12px; transform:translateX(-50%); padding:7px 18px; border-radius:99px; background:rgba(8,22,32,.78); border:1px solid rgba(148,163,184,.3);
+    color:#e2e8f0; font-size:12.5px; pointer-events:none; max-width:94vw; text-align:center; backdrop-filter:blur(8px); z-index:10; }
+  #hint b { color:var(--cyan); }
+
+  #clinicalHud { position:fixed; inset:0; pointer-events:none; z-index:8; display:flex; justify-content:space-between; align-items:flex-start; padding:12px 16px; }
+  .hud-card { width:254px; border-radius:13px; background:rgba(6, 20, 31, 0.82); border:1px solid rgba(34, 211, 238, 0.42);
+    box-shadow:0 10px 28px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.12); backdrop-filter:blur(12px); padding:10px 12px; color:#e8f6fb; }
+  .hud-card h4 { margin:0 0 5px; font-size:10px; font-weight:800; letter-spacing:.14em; color:#67e8f9; text-transform:uppercase; display:flex; align-items:center; justify-content:space-between; }
+  .hud-card h4 span { color:#94a3b8; font-weight:600; }
+  #ecgCanvas { width:100%; height:42px; display:block; background:rgba(3, 10, 16, 0.72); border-radius:7px; border:1px solid rgba(34,211,238,.22); margin-bottom:6px; }
+  .v-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px 8px; font-variant-numeric:tabular-nums; }
+  .v-cell { background:rgba(4, 14, 22, 0.62); border-radius:7px; padding:4px 7px; border:1px solid rgba(148,163,184,.16); }
+  .v-cell small { display:block; font-size:9px; font-weight:700; color:#8fb3c2; letter-spacing:.06em; }
+  .v-cell b { font-size:15px; font-weight:800; font-family:ui-monospace, Consolas, monospace; }
+  .v-cell em { font-style:normal; font-size:9.5px; color:#64748b; margin-left:3px; }
+
+  .chk-list { list-style:none; margin:0; padding:0; display:grid; gap:4px; font-size:11px; pointer-events:auto; }
+  .chk-list li { display:flex; align-items:center; gap:6px; padding:3.5px 6px; border-radius:6px; background:rgba(4, 14, 22, 0.55); border:1px solid rgba(148,163,184,.14); color:#cbd5e1; cursor:pointer; transition:all .15s; }
+  .chk-list li:hover { border-color:rgba(34,211,238,.55); background:rgba(14, 52, 72, 0.65); color:#fff; }
+  .chk-list li.next-step { border-color:#22d3ee; background:rgba(14, 116, 144, 0.45); color:#ffffff; font-weight:700; box-shadow:0 0 12px rgba(34,211,238,.35); }
+  .chk-list li.next-step i { border-color:#22d3ee; color:#22d3ee; }
+  .chk-list li.done { border-color:rgba(52,211,153,.4); background:rgba(6, 48, 38, 0.45); color:#a7f3d0; font-weight:500; box-shadow:none; }
+  .chk-list li i { width:15px; height:15px; border-radius:50%; display:inline-grid; place-items:center; font-style:normal; font-size:10px; font-weight:900; border:1.5px solid #64748b; color:transparent; flex:none; }
+  .chk-list li.done i { background:var(--ok); border-color:var(--ok); color:#042018; }
+
+  /* ---------- EASY MODE DIRECTIONAL ATTENTION ARROW ---------- */
+  #guideArrow { position:fixed; left:50%; top:50%; transform:translate(-50%, -100%); pointer-events:none; z-index:9;
+    display:flex; flex-direction:column; align-items:center; gap:4px; transition:left .08s linear, top .08s linear; }
+  #guideArrow[hidden] { display:none !important; }
+  #guideArrow .ga-pill { padding:6px 14px; border-radius:99px; background:rgba(4, 24, 34, 0.92); border:2px solid #22d3ee;
+    box-shadow:0 0 22px rgba(34,211,238,.55), inset 0 0 10px rgba(34,211,238,.25); color:#ffffff; font-size:12px; font-weight:800;
+    letter-spacing:.08em; white-space:nowrap; text-transform:uppercase; }
+  #guideArrow .ga-icon { width:44px; height:44px; filter:drop-shadow(0 0 12px rgba(34,211,238,.85)); animation:gaBounceDown .75s ease-in-out infinite alternate; }
+  #guideArrow.dir-up { flex-direction:column-reverse; transform:translate(-50%, 0%); }
+  #guideArrow.dir-up .ga-icon { animation:gaBounceUp .75s ease-in-out infinite alternate; }
+  #guideArrow.dir-left { flex-direction:row-reverse; transform:translate(0%, -50%); }
+  #guideArrow.dir-left .ga-icon { animation:gaBounceLeft .75s ease-in-out infinite alternate; }
+  #guideArrow.dir-right { flex-direction:row; transform:translate(-100%, -50%); }
+  #guideArrow.dir-right .ga-icon { animation:gaBounceRight .75s ease-in-out infinite alternate; }
+  @keyframes gaBounceDown { from { transform:translateY(-6px); } to { transform:translateY(6px); } }
+  @keyframes gaBounceUp { from { transform:translateY(6px) rotate(180deg); } to { transform:translateY(-6px) rotate(180deg); } }
+  @keyframes gaBounceLeft { from { transform:translateX(6px) rotate(90deg); } to { transform:translateX(-6px) rotate(90deg); } }
+  @keyframes gaBounceRight { from { transform:translateX(-6px) rotate(-90deg); } to { transform:translateX(6px) rotate(-90deg); } }
+
+  #clinicalHud.hud-large .hud-card { width:310px; padding:13px 15px; }
+  #clinicalHud.hud-large .hud-card h4 { font-size:12px; }
+  #clinicalHud.hud-large .chk-list { font-size:13px; gap:6px; }
+  #clinicalHud.hud-large .chk-list li { padding:5px 8px; }
+  #clinicalHud.hud-large .timer-pill, #clinicalHud.hud-large .pause-btn { font-size:13px; padding:6px 12px; }
+  @media (max-width:1040px) {
+    .pearl-cards { gap:10px; }
+    .p-card { padding:10px 8px; gap:4px; }
+    .p-badge { width:40px; height:40px; font-size:20px; border-radius:12px; }
+    .hud-card { width:212px; padding:8px 10px; }
+    .chk-list { font-size:10px; gap:3px; }
+    .v-cell b { font-size:13.5px; }
+    .setup { grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px; }
+  }
+  @media (max-width:680px) {
+    .pearl-cards { grid-template-columns:1fr; }
+    .tiles { grid-template-columns:repeat(2,minmax(0,160px)); }
+    .setup { grid-template-columns:1fr; }
+    .brand svg { width:54px; height:54px; }
+    #clinicalHud { display:none !important; }
+  }
+
+  /* ---------- PAUSE BUTTON, TOP-LEFT TIMER & PAUSE MODAL ---------- */
+  .vitals-top { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:7px; pointer-events:auto; }
+  .timer-pill { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:8px; background:rgba(3, 12, 20, 0.85); border:1px solid rgba(34, 211, 238, 0.45);
+    font:800 14px/1 ui-monospace, Consolas, monospace; color:#22d3ee; letter-spacing:.06em; }
+  .pause-btn { padding:7px 14px; border-radius:9px; border:1px solid rgba(34, 211, 238, 0.7); background:rgba(14, 116, 144, 0.35); color:#f8fafc;
+    font-size:12px; font-weight:800; letter-spacing:.08em; cursor:pointer; box-shadow:0 2px 10px rgba(34, 211, 238, 0.2); transition:all .15s; }
+  .pause-btn:hover { border-color:#67e8f9; background:rgba(34, 211, 238, 0.45); color:#fff; transform:translateY(-1px); box-shadow:0 4px 14px rgba(34, 211, 238, 0.35); }
+
+  #pauseModal { position:fixed; inset:0; z-index:25; background:rgba(8, 18, 28, 0.68); backdrop-filter:blur(10px); display:grid; place-items:center; padding:20px; }
+  .pause-card { width:min(380px, 100%); border-radius:20px; background:#ffffff; border:1px solid #cbd5e1; box-shadow:0 24px 48px rgba(15, 23, 42, 0.35);
+    padding:26px 24px; text-align:center; display:flex; flex-direction:column; gap:12px; color:#0f172a; }
+  .pause-card h2 { margin:0; font-size:20px; font-weight:900; letter-spacing:.06em; color:#0f172a; }
+  .pause-card p { margin:0 0 6px; font-size:13px; color:#64748b; }
+  .p-btn { width:100%; padding:12px 18px; border-radius:12px; border:1px solid #cbd5e1; background:#f8fafc; color:#0f172a; font-size:13.5px; font-weight:800; letter-spacing:.06em; transition:all .15s; }
+  .p-btn:hover { background:#e2e8f0; border-color:#94a3b8; }
+  .p-btn.primary { background:#0f172a; border-color:var(--cyan); color:#22d3ee; box-shadow:0 6px 18px rgba(15, 23, 42, 0.18); }
+  .p-btn.primary:hover { background:#1e293b; }
+  .p-btn.danger { color:#be123c; border-color:#fecdd3; background:#fff1f2; }
+  .p-btn.danger:hover { background:#ffe4e6; }
+
+  /* ---------- BRIGHT, CLEAN LIGHT-MODE AUDIT SCORECARD ---------- */
+  #report { position:fixed; inset:0; overflow:auto; padding:clamp(16px,3vw,36px); background:radial-gradient(circle at 50% 0%, #ffffff 0%, #f1f5f9 65%, #e2e8f0 100%); color:#0f172a; z-index:20; }
+  .audit { max-width:920px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+  .a-head { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; background:#ffffff; border:1px solid #cbd5e1; border-radius:18px; padding:18px 24px; box-shadow:0 10px 26px rgba(15,23,42,.07); }
+  .a-title-wrap { display:flex; align-items:center; gap:14px; min-width:0; }
+  .a-title-wrap svg { width:46px; height:46px; flex:none; }
+  .a-title-wrap h1 { margin:0; font-size:clamp(18px,2.2vw,23px); font-weight:900; color:#0f172a; letter-spacing:.03em; }
+  .a-title-wrap p { margin:2px 0 0; font-size:13px; color:#64748b; font-weight:600; overflow-wrap:anywhere; }
+  .gradepill { display:inline-flex; align-items:center; gap:12px; padding:10px 20px; border-radius:14px; border:2px solid #10b981; background:#ecfdf5;
+    color:#065f46; font-weight:800; font-size:17px; }
+  .gradepill.bad { border-color:#f43f5e; background:#fff1f2; color:#9f1239; }
+  .gradepill .medal { width:38px; height:38px; border-radius:50%; display:grid; place-items:center; background:#10b981; color:#ffffff; font-size:19px; font-weight:900; }
+  .gradepill.bad .medal { background:#f43f5e; color:#ffffff; }
+  .gradepill em { font-style:normal; font-size:13px; padding:3px 9px; border-radius:99px; background:#d1fae5; color:#047857; }
+  .gradepill.bad em { background:#ffe4e6; color:#be123c; }
+  .a-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .a-cards.a-cards-3 { grid-template-columns:repeat(3,1fr); }
+  .lang-mini { padding:5px 12px; border-radius:99px; border:1px solid #cbd5e1; background:#ffffff; color:#1e293b; font-size:12px; font-weight:700; cursor:pointer; }
+
+  /* ---------- LOADING OVERLAY ---------- */
+  #loadingScreen { position:fixed; inset:0; z-index:40; background:radial-gradient(circle at 50% 35%, #13283d 0%, #091522 100%);
+    display:grid; place-items:center; color:#f8fafc; transition:opacity .25s ease; }
+  .load-card { width:min(360px, calc(100% - 32px)); text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .load-spin { width:54px; height:54px; border-radius:50%; border:4px solid rgba(34,211,238,.2); border-top-color:var(--cyan); animation:spin .85s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .load-card h2 { margin:0; font-size:19px; font-weight:800; letter-spacing:.06em; color:#e6fbff; }
+  .load-card p { margin:0; font-size:13px; color:#94a3b8; }
+  .load-bar { width:100%; height:7px; border-radius:99px; background:rgba(148,163,184,.2); overflow:hidden; }
+  .load-bar > i { display:block; height:100%; width:12%; background:linear-gradient(90deg, #06b6d4, #22d3ee); border-radius:99px; transition:width .25s ease; }
+  .a-card, .a-panel { background:#ffffff; border:1px solid #cbd5e1; border-radius:16px; padding:16px 18px; box-shadow:0 8px 20px rgba(15,23,42,.05); }
+  .a-card h3 { margin:0; font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#64748b; }
+  .a-val { display:flex; align-items:baseline; justify-content:space-between; margin:8px 0 6px; font-size:28px; font-weight:900; color:#0f172a; font-variant-numeric:tabular-nums; }
+  .a-val .g { font-size:13px; font-weight:800; padding:2px 8px; border-radius:6px; background:#f1f5f9; color:#334155; }
+  .a-card p.cap { margin:0; color:#475569; font-size:12.5px; line-height:1.4; }
+  .dot { width:20px; height:20px; border-radius:50%; flex:none; display:inline-grid; place-items:center; background:#10b981; color:#ffffff; font-size:12px; font-weight:900; }
+  .dot.x { background:#f43f5e; color:#ffffff; }
+  .a-panel h2 { margin:0 0 12px; font-size:14px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#334155; }
+  .step-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:8px; list-style:none; margin:0; padding:0; }
+  .step-grid li { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; background:#f8fafc; border:1px solid #e2e8f0; font-size:13.5px; font-weight:600; color:#1e293b; }
+  .step-grid li time { margin-left:auto; font-family:ui-monospace, Consolas, monospace; font-size:12px; color:#64748b; font-weight:700; }
+  .a-foot { display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between; background:#ffffff; border:1px solid #cbd5e1; border-radius:16px; padding:14px 20px; font-size:13px; color:#475569; }
+  .a-actions { display:flex; gap:10px; }
+  .export { padding:10px 20px; border-radius:10px; border:0; background:#0f172a; color:#22d3ee; font-weight:800; letter-spacing:.05em; font-size:13px; }
+  .ghost { padding:10px 18px; border-radius:10px; border:1px solid #cbd5e1; background:#f8fafc; color:#0f172a; font-weight:700; font-size:13px; }
+  .sign { display:none; }
+  @media (max-width:900px) { .a-cards { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px) { .a-cards { grid-template-columns:1fr; } }
+  @media print {
+    html, body { background:#fff; height:auto; } canvas#view, #start, #hint, #pill, #clinicalHud, #guideArrow, #pauseModal, .a-actions { display:none !important; }
+    #report { position:static; background:#fff; padding:0; overflow:visible; }
+    .sign { display:block; margin-top:26px; color:#0f172a; }
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="pill" hidden>P.E.A.R.L. &nbsp;&bull;&nbsp; DENTAL CLINIC &nbsp;&bull;&nbsp; <b id="pillState">ACTIVE</b></div>
+<div id="hint" hidden></div>
+
+<!-- Dynamic Screen-Space Directional Guide Arrow for Easy Mode -->
+<div id="guideArrow" hidden>
+  <div class="ga-pill" id="guideArrowText">STEP 1: CLICK WRIST</div>
+  <svg class="ga-icon" viewBox="0 0 48 48" fill="none">
+    <path d="M24 6v28M12 24l12 14 12-14" stroke="#22d3ee" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M24 6v28M12 24l12 14 12-14" stroke="#a5f3fc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<!-- In-Session Patient Vitals, Timer, Pause Control & RCUK Protocol Checklist HUD -->
+<div id="clinicalHud" hidden>
+  <div class="hud-card" id="hudVitalsCard" style="width:auto; padding:8px 10px;">
+    <div class="vitals-top" style="margin-bottom:0;">
+      <div class="timer-pill">&#9201; <span id="hudClock">00:00</span></div>
+      <button type="button" class="pause-btn" id="btnCamView" title="Switch perspective (V)">VIEW: BESIDE</button>
+      <button type="button" class="pause-btn" id="btnPause">&#10074;&#10074; PAUSE</button>
+    </div>
+  </div>
+
+  <div class="hud-card" id="hudProtocolCard">
+    <h4><span id="hudProtoTitle">RCUK 2021 RESUS PROTOCOL</span> <span id="hudPhase">READY</span></h4>
+    <ul class="chk-list" id="hudChecklist">
+      <li id="chkPulse"><i>&#10003;</i> 1. Palpate Radial Pulse (3s)</li>
+      <li id="chkAirway"><i>&#10003;</i> 2. Inspect Oral Airway (Mirror)</li>
+      <li id="chkDx"><i>&#10003;</i> 3. Confirm Working Diagnosis</li>
+      <li id="chkHelp"><i>&#10003;</i> 4. Summon Nurse Sarah (Emergency)</li>
+      <li id="chkSupine"><i>&#10003;</i> 5. Lay Chair Flat (Supine)</li>
+      <li id="chkAdr"><i>&#10003;</i> 6. IM Adrenaline 0.5mg (10s)</li>
+      <li id="chkO2"><i>&#10003;</i> 7. High-Flow O2 Mask (15L)</li>
+    </ul>
+    <ul class="chk-list" id="hudActionFeed" hidden></ul>
+  </div>
+</div>
+
+<div id="splashOverlay" role="button" tabindex="0" aria-label="Tap screen to start P.E.A.R.L."></div>
+<script>
+  (() => {
+    const sp = document.getElementById('splashOverlay');
+    if (!sp) return;
+    const dismiss = () => { sp.classList.add('hide'); setTimeout(() => { sp.hidden = true; }, 360); };
+    sp.addEventListener('click', dismiss, { once: true });
+    sp.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dismiss(); } }, { once: true });
+  })();
+</script>
+
+<div id="start">
+  <div class="land">
+    <div class="brand">
+      <img class="brand-logo" src="./public/assets/pearl-logo.png" alt="P.E.A.R.L. Simulation Modality">
+    </div>
+
+    <!-- STAGE 1: INITIAL P.E.A.R.L. PILLARS LANDING VIEW -->
+    <div id="stagePearl">
+      <p class="stage-sub">SELECT A MODULE</p>
+      <div class="pearl-cards">
+        <button type="button" class="p-card" id="tabP" data-pillar="PERSONALISATION" disabled tabindex="-1" aria-disabled="true">
+          <img class="p-tile-img" src="./public/assets/tile-p.png" alt="P - Personalisation">
+          <span class="p-go">COMING SOON</span>
+        </button>
+        <button type="button" class="p-card featured" id="tabE" data-pillar="EMERGENCY">
+          <img class="p-tile-img" src="./public/assets/tile-e.png" alt="E - Emergency">
+          <p>Acute emergencies &bull; Worldwide clinical protocols</p>
+          <span class="p-go">Launch &rarr;</span>
+        </button>
+        <button type="button" class="p-card" id="tabA" data-pillar="ASSESSMENT" disabled tabindex="-1" aria-disabled="true">
+          <img class="p-tile-img" src="./public/assets/tile-a.png" alt="A - Assessment">
+          <span class="p-go">COMING SOON</span>
+        </button>
+        <button type="button" class="p-card" id="tabR" data-pillar="REALITY" disabled tabindex="-1" aria-disabled="true">
+          <img class="p-tile-img" src="./public/assets/tile-r.png" alt="R - Reality">
+          <span class="p-go">COMING SOON</span>
+        </button>
+        <button type="button" class="p-card" id="tabL" data-pillar="LANGUAGE" disabled tabindex="-1" aria-disabled="true">
+          <img class="p-tile-img" src="./public/assets/tile-l.png" alt="L - Language">
+          <span class="p-go">COMING SOON</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="pearl-footer" id="pearlFooter">
+      <span><b>WORLDWIDE</b> CLINICAL PROTOCOLS</span>
+      <span><b>FITZPATRICK I&ndash;VI</b> DERMATOLOGICAL SHADERS</span>
+      <span><b>HANDS-FIRST</b> WEBXR &amp; DESKTOP SIMULATION</span>
+    </div>
+
+    <!-- STAGE 2: SIMPLIFIED EMERGENCY DISCIPLINE & BRIEFING SCREEN -->
+    <div id="stageDiscipline" hidden>
+      <div class="top-bar">
+        <button type="button" class="back-btn" id="btnBackToPearl">&larr; Back</button>
+      </div>
+
+      <div class="tiles">
+        <button type="button" class="tile" id="pickMedical" disabled tabindex="-1" aria-disabled="true"><em>COMING SOON</em>
+          <svg viewBox="0 0 48 48" fill="currentColor"><circle cx="24" cy="13" r="8"/><path d="M8 44c0-10 7-16 16-16s16 6 16 16z"/><path d="M22 31h4v4h4v4h-4v4h-4v-4h-4v-4h4z" fill="#fff"/></svg>
+          <b>MEDICAL</b><span>Emergency ER</span>
+        </button>
+        <button type="button" class="tile on" id="pickDental" aria-pressed="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 30h18l6-12"/><path d="M8 30c0 4 3 6 8 6h10"/><path d="M20 36v7M12 43h16"/><circle cx="36" cy="13" r="4.5"/><path d="M36 17.500V26M30 8l-8-3"/><circle cx="14" cy="22" r="3.500"/></svg>
+          <b>DENTAL</b><span>Dental Clinic</span>
+        </button>
+        <button type="button" class="tile" id="pickNursing" disabled tabindex="-1" aria-disabled="true"><em>COMING SOON</em>
+          <svg viewBox="0 0 48 48" fill="currentColor"><path d="M14 9h20l-2 7H16z"/><path d="M22.500 10h3v2h2v2h-2v2h-3v-2h-2v-2h2z" fill="#fff"/><circle cx="24" cy="21" r="7"/><path d="M8 44c0-9 7-14 16-14s16 5 16 14z"/></svg>
+          <b>NURSING</b><span>Acute Ward</span>
+        </button>
+        <button type="button" class="tile" id="pickParamedic" disabled tabindex="-1" aria-disabled="true"><em>COMING SOON</em>
+          <svg viewBox="0 0 48 48" fill="currentColor"><g transform="translate(24 24)"><rect x="-5" y="-20" width="10" height="40" rx="2"/><rect x="-5" y="-20" width="10" height="40" rx="2" transform="rotate(60)"/><rect x="-5" y="-20" width="10" height="40" rx="2" transform="rotate(120)"/></g><path d="M24 12v24M21 16c3 2 3 4 0 6s-3 4 0 6" stroke="#fff" stroke-width="1.800" fill="none"/></svg>
+          <b>PARAMEDIC</b><span>EMS Field</span>
+        </button>
+      </div>
+
+      <div class="dossier">
+        <div class="char-banner" id="charBanner" style="margin-bottom:0;">
+          <div class="char-info">
+            <h3 id="dossierCharTitle">Random Patient &bull; Random Acute Emergency</h3>
+            <p id="dossierCharSub">Routine Dental Checkup</p>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="active-tag" id="dossierBadge">Random Case</span>
+            <button type="button" class="cfg-btn" id="btnCaseSettings">&#9881; Settings</button>
+          </div>
+        </div>
+
+        <div class="diff-bar" id="diffBar">
+          <span>Guidance</span>
+          <div class="diff-pills" id="diffPills">
+            <button type="button" class="diff-pill on" data-diff="easy">Easy (Guided)</button>
+            <button type="button" class="diff-pill" data-diff="medium">Medium (Idle Hint)</button>
+            <button type="button" class="diff-pill" data-diff="hard">Hard (No Hints)</button>
+          </div>
+        </div>
+
+        <div class="setup" id="caseSetupPanel" hidden>
+          <div>
+            <label for="fPatient">Patient</label>
+            <select id="fPatient">
+              <option value="random" selected>Random Patient</option>
+              <option value="adebayo">Mrs. Alex Adebayo (68yo)</option>
+              <option value="patel">Mr. Aarav Patel (42yo)</option>
+              <option value="miller">Mrs. Sarah Miller (74yo)</option>
+              <option value="chen">Master David Chen (8yo)</option>
+            </select>
+          </div>
+          <div>
+            <label for="fDisease">Emergency</label>
+            <select id="fDisease">
+              <option value="random" selected>Random Acute Emergency</option>
+              <option value="anaphylaxis">Acute Anaphylaxis</option>
+              <option value="hypoglycaemia">Severe Hypoglycaemia</option>
+            </select>
+          </div>
+          <div>
+            <label for="fDifficulty">Guidance</label>
+            <select id="fDifficulty">
+              <option value="easy" selected>Easy (Guided)</option>
+              <option value="medium">Medium (OSCE)</option>
+              <option value="hard">Hard (Unassisted)</option>
+            </select>
+          </div>
+          <div>
+            <label for="fName">Your Name</label>
+            <input id="fName" autocomplete="off" placeholder="Optional">
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <label for="fElevenKey">ElevenLabs API Key (Expressive Character Voices)</label>
+            <input id="fElevenKey" type="password" autocomplete="off" placeholder="Paste sk_... key (stored locally in browser)">
+          </div>
+        </div>
+
+        <input type="hidden" id="fTone" value="VI">
+      </div>
+
+      <div class="enter">
+        <div class="cta">
+          <button type="button" id="btnDesktop" class="pill">ENTER DENTAL CLINIC</button>
+          <button type="button" id="btnVR" class="pill alt" disabled>ENTER IN VR</button>
+          <button type="button" id="btnAR" class="pill alt" disabled>MIXED REALITY</button>
+        </div>
+        <p id="xrNote">Checking for a headset&hellip;</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loadingScreen" hidden>
+  <div class="load-card">
+    <div class="load-spin" aria-hidden="true"></div>
+    <h2>Preparing Dental Clinic&hellip;</h2>
+    <p id="loadText">Loading 3D environment (0/3)</p>
+    <div class="load-bar"><i id="loadBarFill"></i></div>
+  </div>
+</div>
+
+<div id="pauseModal" hidden>
+  <div class="pause-card">
+    <h2>SIMULATION PAUSED</h2>
+    <p>P.E.A.R.L. Dental Clinic &bull; Acute Anaphylaxis</p>
+    <button type="button" class="p-btn primary" id="btnResume">&#9654; RESUME SIMULATION</button>
+    <button type="button" class="p-btn" id="btnRestart">&#8635; RESTART SCENARIO</button>
+    <button type="button" class="p-btn danger" id="btnExit">&#10005; EXIT TO MAIN MENU</button>
+  </div>
+</div>
+
+<div id="report" hidden></div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
