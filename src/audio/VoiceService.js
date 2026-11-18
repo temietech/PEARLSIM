@@ -98,6 +98,31 @@ export class VoiceService {
     this.stop();
     const seq = this.reqSeq;
 
+    // 1. Play bundled pre-generated ElevenLabs eleven_v3 MP3 if available (no API key required)
+    const staticFile = isNurse
+      ? 'nurse_emergency.mp3'
+      : /severe pharyngeal angioedema/i.test(cleanSpoken)
+        ? 'airway_anaph.mp3'
+        : /oral airway is clear/i.test(cleanSpoken)
+          ? 'airway_clear.mp3'
+          : /lips are tingling/i.test(cleanSpoken)
+            ? `${speaker}_anaph_opening.mp3`
+            : /throat feels tight/i.test(cleanSpoken)
+              ? `${speaker}_anaph_established.mp3`
+              : /shaky and dizzy/i.test(cleanSpoken)
+                ? `${speaker}_hypo_opening.mp3`
+                : /Everything is spinning/i.test(cleanSpoken)
+                  ? `${speaker}_hypo_established.mp3`
+                  : null;
+    if (staticFile) {
+      try {
+        const audio = new Audio(`./public/audio/voices/${staticFile}`);
+        this.activeAudio = audio;
+        await audio.play();
+        if (seq === this.reqSeq) return;
+      } catch { /* fall through to live API or WebSpeech */ }
+    }
+
     if (this.apiKey) {
       const voiceId = VOICE_MAP[speaker] || VOICE_MAP.adebayo;
       const expr = this.buildExpressivePrompt(cleanSpoken, {
